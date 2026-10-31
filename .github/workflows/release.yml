@@ -16,8 +16,8 @@ on:
     workflows: [checks, parity-main]
     types: [completed]
     branches: [main]
-  schedule:
-    - cron: '2-59/10 * * * *'
+  # schedule:
+  #   - cron: '2-59/10 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:

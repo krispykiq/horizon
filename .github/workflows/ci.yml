@@ -8,8 +8,8 @@ name: checks
 # request runs it only when a maintainer adds the run-parity label (.github/workflows/run-parity.yml), so labels
 # never start this workflow. See docs/release-flow.md.
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:

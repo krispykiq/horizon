@@ -7,10 +7,10 @@ name: nightly audit
 #   gh workflow run "nightly audit"                    # now
 #   gh workflow run "nightly audit" -f dry_run=true    # the audit, without touching issues
 on:
-  schedule:
-    # GitHub's schedules are in UTC: both, and the first step keeps the one that is 03:07 in Paris today.
-    - cron: '7 1 * * *'
-    - cron: '7 2 * * *'
+  # schedule:
+  #   # GitHub's schedules are in UTC: both, and the first step keeps the one that is 03:07 in Paris today.
+  #   - cron: '7 1 * * *'
+  #   - cron: '7 2 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
