@@ -456,6 +456,18 @@ pub fn data_dir() -> PathBuf {
     if let Some(home) = std::env::var_os("HORIZON_LAUNCHER_HOME").filter(|h| !h.is_empty()) {
         return PathBuf::from(home);
     }
+
+    #[cfg(windows)]
+    {
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(exe_dir) = exe.parent() {
+                if exe_dir.join("portable.txt").exists() {
+                    return exe_dir.join("horizon-launcher");
+                }
+            }
+        }
+    }
+
     dirs::data_dir()
         .unwrap_or_else(std::env::temp_dir)
         .join("horizon-launcher")
@@ -1850,6 +1862,18 @@ pub fn game_home() -> PathBuf {
     if let Some(home) = std::env::var_os("HORIZON_HOME").filter(|h| !h.is_empty()) {
         return PathBuf::from(home);
     }
+
+    #[cfg(windows)]
+    {
+        if let Ok(exe) = std::env::current_exe() {
+            if let Some(exe_dir) = exe.parent() {
+                if exe_dir.join("portable.txt").exists() {
+                    return exe_dir.join("horizon");
+                }
+            }
+        }
+    }
+
     dirs::data_dir()
         .unwrap_or_else(std::env::temp_dir)
         .join("horizon")
