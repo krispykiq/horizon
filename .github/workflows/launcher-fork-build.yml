@@ -61,6 +61,7 @@ jobs:
         run: echo "dry_run=${{ github.ref != 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}" >> "$GITHUB_OUTPUT"
       - id: decide
         env:
+          HORIZON_MSA_CLIENT_ID: ${{ vars.HORIZON_MSA_CLIENT_ID }}
           GH_TOKEN: ${{ github.token }}
           RELEASES_PAUSED: ${{ vars.RELEASES_PAUSED }}
           HEAD_SHA: ${{ (github.event_name == 'push' || steps.mode.outputs.dry_run == 'true') && github.sha || '' }}
@@ -103,6 +104,7 @@ jobs:
       RUSTFLAGS: ${{ matrix.rustflags }}
       HORIZON_LAUNCHER_VERSION: ${{ needs.decide.outputs.version }}
       HORIZON_LAUNCHER_TAG: ${{ needs.decide.outputs.tag }}
+      HORIZON_MSA_CLIENT_ID: ${{ vars.HORIZON_MSA_CLIENT_ID }}
     defaults:
       run:
         working-directory: launcher
