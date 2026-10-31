@@ -4203,7 +4203,8 @@ impl Game<'_> {
     /// never in the tab list: resolve each profile's textures and give the
     /// level's player models their skin.
     fn update_remote_skins(&mut self) {
-        let Some(r) = self.remote.as_mut() else {
+        // let Some(r) = self.remote.as_mut() else {
+        let Some(r) = self.remote.as_ref() else {
             return;
         };
         let mut entries = skin_entries(
