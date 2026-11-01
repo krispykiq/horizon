@@ -53,7 +53,7 @@ impl Launcher {
             _ if sign_in_preview() => Shown::Code("https://www.microsoft.com/link", "K7Q-4MXR"),
             _ if !configured => Shown::Error(tr(account::NOT_CONFIGURED)),
             Some(SignInState::Starting) => Shown::Starting,
-            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri, &code.user_code),
+            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri(), &code.user_code()),
             Some(SignInState::Done(Err(e))) => Shown::Error(e),
             Some(SignInState::Done(Ok(_))) | None => Shown::Idle,
         };
