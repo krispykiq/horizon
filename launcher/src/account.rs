@@ -789,18 +789,15 @@ fn check(ep: &Endpoints, client_id: Option<&str>, account: &Account, secrets: Se
                 owns: false,
                 ..secrets
             }),
-            Ok(None) => Check::NoAnswer(
-                "Could not check which games this account owns. Trying again next time.".into(),
-                secrets,
-            ),
-            Err(e) => Check::NoAnswer(e, secrets),
-            Ok(Some(true)) => match profile(ep, token, secrets.provider) {
+            Ok(Some(_)) => match profile(ep, token, secrets.provider) {
                 Err(e) => Check::NoAnswer(e, secrets),
                 Ok(None) => Check::DoesNot(Secrets {
                     owns: false,
                     ..secrets
                 }),
-                Ok(Some(p)) if p.uuid != account.uuid => Check::NoAnswer(OTHER_PROFILE.into(), secrets),
+                Ok(Some(p)) if p.uuid != account.uuid => {
+                    Check::NoAnswer(OTHER_PROFILE.into(), secrets)
+                }
                 Ok(Some(p)) => Check::Owns(
                     p,
                     Secrets {
@@ -811,12 +808,15 @@ fn check(ep: &Endpoints, client_id: Option<&str>, account: &Account, secrets: Se
             },
         };
     }
+
     match owns_game(ep, token) {
         Ok(Some(false)) => Check::DoesNot(Secrets {
             owns: false,
             ..secrets
         }),
-        Ok(Some(p)) if p.uuid != account.uuid => Check::NoAnswer(OTHER_PROFILE.into(), secrets),
+        Ok(Some(p)) if p.uuid != account.uuid => {
+            Check::NoAnswer(OTHER_PROFILE.into(), secrets)
+        }
         Ok(Some(p)) => Check::Owns(
             p,
             Secrets {
