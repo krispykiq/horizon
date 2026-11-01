@@ -20,6 +20,7 @@ const NOT_TOOLS: &[&str] = &[
     "play",
     "server",
     "account sign-in",
+    "account ely-sign-in",
     "account list",
 ];
 

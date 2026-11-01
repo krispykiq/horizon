@@ -24,9 +24,9 @@ impl Launcher {
     }
 
     /// Opens the screen and starts the sign-in on it.
-    pub(crate) fn sign_in_to_play(&mut self) {
+    pub(crate) fn sign_in_to_play(&mut self, provider: account::AccountProvider) {
         self.owner_screen_open = true;
-        self.start_sign_in();
+        self.start_sign_in(provider);
     }
 
     /// Closes it; it comes back with the next refused Play.
@@ -45,13 +45,15 @@ impl Launcher {
     pub(crate) fn owner_screen(&mut self, cx: &mut Context<Self>) -> Stateful<Div> {
         let t = self.theme;
         let n = t.night;
-        let configured = account::client_id().is_some();
+        let microsoft = account::client_id().is_some();
+        let ely = account::ely_client_id().is_some();
+        let configured = microsoft || ely;
         // The screenshot preview shows a code without asking Microsoft for one.
         let state = match &self.sign_in_state {
             _ if sign_in_preview() => Shown::Code("https://www.microsoft.com/link", "K7Q-4MXR"),
             _ if !configured => Shown::Error(tr(account::NOT_CONFIGURED)),
             Some(SignInState::Starting) => Shown::Starting,
-            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri, &code.user_code),
+            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri(), &code.user_code()),
             Some(SignInState::Done(Err(e))) => Shown::Error(e),
             Some(SignInState::Done(Ok(_))) | None => Shown::Idle,
         };
@@ -68,7 +70,7 @@ impl Launcher {
             .child(
                 shell::text(theme::night::CAPTION, shell::c(n.muted))
                     .font_weight(FontWeight::SEMIBOLD)
-                    .child(tr("Microsoft account").to_string()),
+                    .child(tr("Account").to_string()),
             )
             .child(
                 shell::text(theme::night::TITLE, shell::c(n.ink))
@@ -98,8 +100,8 @@ impl Launcher {
                 .border_color(plate::alpha(n.stroke, n.stroke_alpha))
         };
         body = match state {
-            Shown::Code(uri, user_code) => {
-                let copy = user_code.to_string();
+            Shown::Code(uri, user_code()) => {
+                let copy = user_code().to_string();
                 body.child(
                     raised()
                         .flex()
@@ -118,7 +120,7 @@ impl Launcher {
                                         trf(
                                             "Open {link} in your browser and enter this code:",
                                             // The page as the player would type it.
-                                            &[("link", short_link(uri))],
+                                            &[("link", code.verification_uri())],
                                         ),
                                     ),
                                 )
@@ -129,7 +131,7 @@ impl Launcher {
                                         .text_size(px(30.))
                                         .line_height(px(38.))
                                         .text_color(shell::c(n.ink))
-                                        .child(user_code.to_string()),
+                                        .child(user_code().to_string()),
                                 ),
                         )
                         .child(
@@ -170,8 +172,16 @@ impl Launcher {
             _ => Some(
                 microsoft::sign_in_button("owner-sign-in", &t).on_click(cx.listener(
                     |this, _: &ClickEvent, _, cx| {
-                        this.sign_in_to_play();
-                        cx.notify();
+                        if account::client_id().is_some() {
+                            this.sign_in_to_play(account::AccountProvider::Microsoft);
+                            cx.notify();
+                        }
+
+                        if account::ely_client_id().is_some() {
+                            this.sign_in_to_play(account::AccountProvider::Ely);
+                            cx.notify();
+                        }
+
                     },
                 )),
             ),
