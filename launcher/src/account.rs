@@ -815,7 +815,7 @@ fn check(ep: &Endpoints, client_id: Option<&str>, account: &Account, secrets: Se
             ..secrets
         }),
         Ok(Some(true)) => Check::Owns(
-            account,
+            account.clone(),
             Secrets {
                 owns: true,
                 ..secrets
