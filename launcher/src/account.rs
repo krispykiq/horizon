@@ -814,16 +814,18 @@ fn check(ep: &Endpoints, client_id: Option<&str>, account: &Account, secrets: Se
             owns: false,
             ..secrets
         }),
-        Ok(Some(p)) if p.uuid != account.uuid => {
-            Check::NoAnswer(OTHER_PROFILE.into(), secrets)
-        }
-        Ok(Some(p)) => Check::Owns(
-            p,
+        Ok(Some(true)) => Check::Owns(
+            account,
             Secrets {
                 owns: true,
                 ..secrets
             },
         ),
+        Ok(None) => Check::NoAnswer(
+            "Could not check which games this account owns. Trying again next time.".into(),
+            secrets,
+        ),
+        Err(e) => Check::NoAnswer(e, secrets),
     }
 }
 
