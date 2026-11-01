@@ -53,7 +53,7 @@ impl Launcher {
             _ if sign_in_preview() => Shown::Code("https://www.microsoft.com/link", "K7Q-4MXR"),
             _ if !configured => Shown::Error(tr(account::NOT_CONFIGURED)),
             Some(SignInState::Starting) => Shown::Starting,
-            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri(), &code.user_code()),
+            Some(SignInState::Code(code)) => Shown::Code(&code.verification_uri, &code.user_code),
             Some(SignInState::Done(Err(e))) => Shown::Error(e),
             Some(SignInState::Done(Ok(_))) | None => Shown::Idle,
         };
@@ -100,8 +100,8 @@ impl Launcher {
                 .border_color(plate::alpha(n.stroke, n.stroke_alpha))
         };
         body = match state {
-            Shown::Code(uri, user_code()) => {
-                let copy = user_code().to_string();
+            Shown::Code(uri, user_code) => {
+                let copy = user_code.to_string();
                 body.child(
                     raised()
                         .flex()
@@ -120,7 +120,7 @@ impl Launcher {
                                         trf(
                                             "Open {link} in your browser and enter this code:",
                                             // The page as the player would type it.
-                                            &[("link", code.verification_uri())],
+                                            &[("link", short_link(uri))],
                                         ),
                                     ),
                                 )
@@ -131,7 +131,7 @@ impl Launcher {
                                         .text_size(px(30.))
                                         .line_height(px(38.))
                                         .text_color(shell::c(n.ink))
-                                        .child(user_code().to_string()),
+                                        .child(user_code.to_string()),
                                 ),
                         )
                         .child(
