@@ -4207,13 +4207,20 @@ impl Game<'_> {
         let Some(r) = self.remote.as_ref() else {
             return;
         };
-        let mut entries = skin_entries(
-            &r.level_players,
-            &r.skin_textures,
-            &mut r.level_player_textures,
-        );
         let r = &*r;
         let local = r.profile;
+        // let mut entries = skin_entries(
+        //     &r.level_players,
+        //     &r.skin_textures,
+        //     &mut r.level_player_textures,
+        // );
+
+        let mut entries: Vec<(u128, horizon_client::skins::Textures)> = r
+            .skin_textures
+            .iter()
+            .map(|(uuid, textures)| (*uuid, textures.clone()))
+            .collect();
+
         // Minecraft.profileFuture: the signed-in account's own profile, fetched from the
         // services, gives the local player its skin where the server sends none (single
         // player's offline-mode server).
