@@ -579,7 +579,7 @@ fn bearer(request: ureq::Request, token: &str) -> ureq::Request {
 }
 
 /// Whether the account owns Minecraft: Java Edition (Game Pass included).
-fn owns_game(ep: &Endpoints, token: &str) -> Result<bool, String> {
+fn owns_game(ep: &Endpoints, token: &str) -> Result<Option<bool>, String> {
     let (status, v) = send(
         bearer(
             request_to("GET", &format!("{}/entitlements/mcstore", ep.minecraft)),
